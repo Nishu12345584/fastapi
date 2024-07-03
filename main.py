@@ -1,8 +1,9 @@
 from fastapi import FastAPI
+from mangum import Mangum
 
 app = FastAPI()
-                 
-fake_db = []                   
+
+fake_db = []
 
 @app.get("/")
 def root():
@@ -34,3 +35,13 @@ def delete_item(item_id: int):
         if fake_db[i]["item_id"] == item_id:
             del fake_db[i]
             return {"message": "Item deleted"}
+
+# Lambda handler
+handler = Mangum(app)
+
+def lambda_handler(event, context):
+    response = handler(event, context)
+    return {
+        'statusCode': response['statusCode'],
+        'body': response['body']
+    }
